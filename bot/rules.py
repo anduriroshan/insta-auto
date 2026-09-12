@@ -7,26 +7,41 @@ from core.models import AutomationRule, UserCooldown, QueuedDM
 
 class RuleEngine:
     @staticmethod
-    def match_rule(text: str, event_type: str, session: Session) -> Optional[AutomationRule]:
+    def match_rule(text: str, event_type: str, session: Session, media_id: Optional[str] = None) -> Optional[AutomationRule]:
         """
         Finds the first active matching AutomationRule for the given input text and event type.
         Supported event_types: 'dm', 'comment', 'story'.
         Rule types: 'all', 'dm', 'comment', 'story'.
+
+        Rules scoped to a specific reel/post (target_media_id) only apply when `media_id`
+        matches, and are checked before global (unscoped) rules — so the same keyword can
+        be mapped to a different resource per reel. Rules with no keywords act as a
+        catch-all/fallback: they're only used if nothing else matched.
         """
         clean_text = text.strip().lower()
 
-        # Query all active rules
+        # Query all active rules eligible for this event type and this specific media
         statement = select(AutomationRule).where(AutomationRule.is_active == True)
         rules = session.exec(statement).all()
 
+        eligible = []
         for rule in rules:
-            # Check event type suitability
             if rule.rule_type != "all" and rule.rule_type != event_type:
                 continue
+            if rule.target_media_id and rule.target_media_id != media_id:
+                continue
+            eligible.append(rule)
 
+        # Media-scoped rules take priority over global (unscoped) rules
+        eligible.sort(key=lambda r: 0 if r.target_media_id else 1)
+
+        fallback: Optional[AutomationRule] = None
+        for rule in eligible:
             keywords = rule.get_keywords_list()
             # If no keywords specified, this is a catch-all / fallback rule
             if not keywords:
+                if fallback is None:
+                    fallback = rule
                 continue
 
             for kw in keywords:
@@ -48,7 +63,7 @@ class RuleEngine:
                     if kw in clean_text:
                         return rule
 
-        return None
+        return fallback
 
     @staticmethod
     def check_cooldown(sender_id: str, rule: AutomationRule, session: Session) -> bool:

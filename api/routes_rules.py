@@ -16,6 +16,10 @@ class RuleCreateUpdate(BaseModel):
     rule_type: str = "all"        # 'all', 'dm', 'comment', 'story'
     response_text: str
     response_media_url: Optional[str] = None
+    target_media_id: Optional[str] = None
+    target_media_permalink: Optional[str] = None
+    public_reply_enabled: bool = False
+    public_reply_text: Optional[str] = None
     follow_gate_enabled: bool = False
     follow_gate_message: Optional[str] = "Hey! Please follow our page first, then send the keyword again to get your link! 🚀"
     cooldown_minutes: int = 1440
@@ -30,6 +34,10 @@ def rule_to_dict(rule: AutomationRule) -> dict:
         "rule_type": rule.rule_type,
         "response_text": rule.response_text,
         "response_media_url": rule.response_media_url,
+        "target_media_id": rule.target_media_id,
+        "target_media_permalink": rule.target_media_permalink,
+        "public_reply_enabled": rule.public_reply_enabled,
+        "public_reply_text": rule.public_reply_text,
         "follow_gate_enabled": rule.follow_gate_enabled,
         "follow_gate_message": rule.follow_gate_message,
         "cooldown_minutes": rule.cooldown_minutes,
@@ -51,6 +59,10 @@ async def create_rule(data: RuleCreateUpdate, session: Session = Depends(get_ses
         rule_type=data.rule_type,
         response_text=data.response_text,
         response_media_url=data.response_media_url,
+        target_media_id=data.target_media_id,
+        target_media_permalink=data.target_media_permalink,
+        public_reply_enabled=data.public_reply_enabled,
+        public_reply_text=data.public_reply_text,
         follow_gate_enabled=data.follow_gate_enabled,
         follow_gate_message=data.follow_gate_message or "Hey! Please follow our page first, then send the keyword again! 🚀",
         cooldown_minutes=data.cooldown_minutes,
@@ -81,6 +93,10 @@ async def update_rule(rule_id: int, data: RuleCreateUpdate, session: Session = D
     rule.rule_type = data.rule_type
     rule.response_text = data.response_text
     rule.response_media_url = data.response_media_url
+    rule.target_media_id = data.target_media_id
+    rule.target_media_permalink = data.target_media_permalink
+    rule.public_reply_enabled = data.public_reply_enabled
+    rule.public_reply_text = data.public_reply_text
     rule.follow_gate_enabled = data.follow_gate_enabled
     if data.follow_gate_message:
         rule.follow_gate_message = data.follow_gate_message

@@ -188,7 +188,7 @@ class EventHandler:
         """Processes incoming comment on a post/reel."""
         logger.info(f"Incoming comment from @{event.sender_username}: {event.text}")
 
-        rule = RuleEngine.match_rule(event.text, "comment", session)
+        rule = RuleEngine.match_rule(event.text, "comment", session, media_id=event.media_id)
         if not rule:
             logger.info(f"No rule matched for comment: {event.text}")
             return
@@ -220,6 +220,25 @@ class EventHandler:
             status=status_str,
             details=details_str
         )
+
+        # Optional public reply on the comment itself (visible social proof), in addition to the DM
+        if rule.public_reply_enabled and rule.public_reply_text:
+            public_result = await ig_client.reply_to_comment(event.comment_id, rule.public_reply_text)
+            public_status = "success" if not public_result.get("error") else "failed"
+            public_details = f"Public reply posted for comment '{event.text}'"
+            if public_result.get("error"):
+                public_details = f"Meta Public Reply Error: {public_result.get('error', {}).get('message')}"
+
+            create_and_broadcast_log(
+                session=session,
+                event_type="public_reply_sent",
+                sender_id=event.sender_id,
+                sender_username=event.sender_username,
+                rule_id=rule.id,
+                rule_name=rule.name,
+                status=public_status,
+                details=public_details
+            )
 
     @staticmethod
     async def handle_story_mention(event: ParsedEvent, session: Session):

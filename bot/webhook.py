@@ -19,6 +19,7 @@ class ParsedEvent:
     media_id: Optional[str] = None
     story_url: Optional[str] = None
     timestamp: Optional[int] = None
+    event_id: Optional[str] = None  # stable dedup key: message mid, or comment id
 
 def verify_hub_token(mode: Optional[str], token: Optional[str]) -> bool:
     """Verifies the hub.mode and hub.verify_token during webhook registration."""
@@ -92,6 +93,8 @@ def parse_webhook_payload(data: Dict[str, Any]) -> List[ParsedEvent]:
                         is_story_mention = True
                         story_url = att.get("payload", {}).get("url")
 
+                mid = message.get("mid")
+
                 if is_story_mention:
                     events.append(ParsedEvent(
                         event_type="story_mention",
@@ -100,7 +103,8 @@ def parse_webhook_payload(data: Dict[str, Any]) -> List[ParsedEvent]:
                         text=text or "Story Mention",
                         story_url=story_url,
                         timestamp=entry_time,
-                        raw_payload=item
+                        raw_payload=item,
+                        event_id=mid
                     ))
                 elif text or message:
                     events.append(ParsedEvent(
@@ -109,7 +113,8 @@ def parse_webhook_payload(data: Dict[str, Any]) -> List[ParsedEvent]:
                         sender_username=None,
                         text=text.strip(),
                         timestamp=entry_time,
-                        raw_payload=item
+                        raw_payload=item,
+                        event_id=mid
                     ))
 
         # 2. Check changes array (Comments on posts)
@@ -135,7 +140,8 @@ def parse_webhook_payload(data: Dict[str, Any]) -> List[ParsedEvent]:
                         comment_id=comment_id,
                         media_id=media_id,
                         timestamp=entry_time,
-                        raw_payload=change
+                        raw_payload=change,
+                        event_id=comment_id
                     ))
 
     return events

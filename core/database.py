@@ -1,4 +1,5 @@
 from sqlmodel import SQLModel, create_engine, Session, select
+from sqlalchemy import inspect, text
 from config import settings
 import os
 
@@ -9,8 +10,35 @@ engine = create_engine(
     connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
 )
 
+# Columns added after the initial release. create_all() only creates missing
+# tables, not missing columns on existing tables, so an existing insta_auto.db
+# needs these added by hand on startup.
+_COLUMN_MIGRATIONS = {
+    "automationrule": {
+        "target_media_id": "VARCHAR",
+        "target_media_permalink": "VARCHAR",
+        "public_reply_enabled": "BOOLEAN DEFAULT 0",
+        "public_reply_text": "VARCHAR",
+    },
+}
+
+def _run_column_migrations():
+    if "sqlite" not in settings.DATABASE_URL:
+        return
+    inspector = inspect(engine)
+    existing_tables = set(inspector.get_table_names())
+    with engine.begin() as conn:
+        for table, columns in _COLUMN_MIGRATIONS.items():
+            if table not in existing_tables:
+                continue
+            existing_columns = {c["name"] for c in inspector.get_columns(table)}
+            for column, coltype in columns.items():
+                if column not in existing_columns:
+                    conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {coltype}"))
+
 def init_db():
     SQLModel.metadata.create_all(engine)
+    _run_column_migrations()
     # Seed default sample rule if empty
     with Session(engine) as session:
         existing = session.exec(select(SQLModel.metadata.tables['automationrule'])).first()

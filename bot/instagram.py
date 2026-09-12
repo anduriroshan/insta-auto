@@ -1,6 +1,7 @@
+import asyncio
 import httpx
 import logging
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from config import settings
 
 logger = logging.getLogger("instagram_api")
@@ -10,6 +11,36 @@ class InstagramGraphAPI:
         self.access_token = page_access_token or settings.PAGE_ACCESS_TOKEN
         self.ig_account_id = ig_account_id or settings.INSTAGRAM_ACCOUNT_ID
         self.page_id = settings.PAGE_ID
+
+    async def _request_with_retry(self, client: httpx.AsyncClient, method: str, url: str, max_retries: int = 3, **kwargs) -> httpx.Response:
+        """
+        Runs an HTTP request with exponential backoff on network errors, rate limiting (429),
+        and transient 5xx errors from the Graph API. A viral reel can burst far more comments
+        through than a single request budget, so retrying here avoids silently dropped sends.
+        """
+        delay = 0.5
+        res: Optional[httpx.Response] = None
+        for attempt in range(max_retries):
+            try:
+                res = await client.request(method, url, **kwargs)
+            except httpx.RequestError as e:
+                if attempt == max_retries - 1:
+                    raise
+                logger.warning(f"Graph API request error ({e}), retrying in {delay}s...")
+                await asyncio.sleep(delay)
+                delay *= 3
+                continue
+
+            if res.status_code == 429 or res.status_code >= 500:
+                if attempt == max_retries - 1:
+                    return res
+                logger.warning(f"Graph API returned {res.status_code}, retrying in {delay}s...")
+                await asyncio.sleep(delay)
+                delay *= 3
+                continue
+
+            return res
+        return res
 
     @property
     def base_url(self) -> str:
@@ -56,14 +87,14 @@ class InstagramGraphAPI:
             }
             # Also send text if provided
             async with httpx.AsyncClient(timeout=15.0) as client:
-                res = await client.post(url, params=params, json=payload)
+                res = await self._request_with_retry(client, "POST", url, params=params, json=payload)
                 if text.strip():
                     text_payload = {
                         "recipient": {"id": recipient_id},
                         "messaging_type": "RESPONSE",
                         "message": {"text": text}
                     }
-                    await client.post(url, params=params, json=text_payload)
+                    await self._request_with_retry(client, "POST", url, params=params, json=text_payload)
                 data = res.json()
                 if res.status_code >= 400:
                     logger.error(f"Failed to send DM: {data}")
@@ -72,7 +103,7 @@ class InstagramGraphAPI:
         payload["message"] = {"text": text}
 
         async with httpx.AsyncClient(timeout=15.0) as client:
-            res = await client.post(url, params=params, json=payload)
+            res = await self._request_with_retry(client, "POST", url, params=params, json=payload)
             data = res.json()
             if res.status_code >= 400:
                 logger.error(f"Meta Send DM error: {data}")
@@ -94,11 +125,59 @@ class InstagramGraphAPI:
         }
 
         async with httpx.AsyncClient(timeout=15.0) as client:
-            res = await client.post(url, params=params, json=payload)
+            res = await self._request_with_retry(client, "POST", url, params=params, json=payload)
             data = res.json()
             if res.status_code >= 400:
                 logger.error(f"Meta Private Reply error: {data}")
             return data
+
+    async def reply_to_comment(self, comment_id: str, text: str) -> Dict[str, Any]:
+        """
+        Publicly replies to a comment (visible to everyone under the reel/post), as opposed
+        to send_private_reply which sends a DM. Uses POST /{comment_id}/replies.
+        """
+        if not self.access_token:
+            raise ValueError("PAGE_ACCESS_TOKEN is not configured.")
+
+        url = f"{self.base_url}/{comment_id}/replies"
+        params = {"access_token": self.access_token, "message": text}
+
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            res = await self._request_with_retry(client, "POST", url, params=params)
+            data = res.json()
+            if res.status_code >= 400:
+                logger.error(f"Meta Public Reply error: {data}")
+            return data
+
+    async def get_recent_media(self, limit: int = 25) -> List[Dict[str, Any]]:
+        """
+        Fetches recent posts/reels from the connected IG account so a rule can be scoped
+        to one specific piece of content (e.g. different resources per reel).
+        """
+        if not self.access_token:
+            raise ValueError("PAGE_ACCESS_TOKEN is not configured.")
+
+        is_ig_token = self.access_token.startswith("IG")
+        if is_ig_token:
+            url = f"{self.base_url}/me/media"
+        else:
+            if not self.ig_account_id:
+                raise ValueError("INSTAGRAM_ACCOUNT_ID is not configured.")
+            url = f"{self.base_url}/{self.ig_account_id}/media"
+
+        params = {
+            "fields": "id,caption,media_type,media_url,permalink,thumbnail_url,timestamp",
+            "limit": limit,
+            "access_token": self.access_token
+        }
+
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            res = await self._request_with_retry(client, "GET", url, params=params)
+            data = res.json()
+            if res.status_code >= 400:
+                logger.error(f"Failed to fetch recent media: {data}")
+                raise ValueError(data.get("error", {}).get("message", "Failed to fetch recent media"))
+            return data.get("data", [])
 
     async def get_user_profile(self, scoped_user_id: str) -> Dict[str, Any]:
         """
@@ -116,7 +195,7 @@ class InstagramGraphAPI:
 
         try:
             async with httpx.AsyncClient(timeout=10.0) as client:
-                res = await client.get(url, params=params)
+                res = await self._request_with_retry(client, "GET", url, params=params)
                 if res.status_code == 200:
                     return res.json()
                 else:
@@ -142,7 +221,7 @@ class InstagramGraphAPI:
         }
 
         async with httpx.AsyncClient(timeout=15.0) as client:
-            res = await client.post(url, params=params, json=payload)
+            res = await self._request_with_retry(client, "POST", url, params=params, json=payload)
             return res.json()
 
     async def verify_connection(self) -> Dict[str, Any]:
@@ -161,7 +240,7 @@ class InstagramGraphAPI:
 
         try:
             async with httpx.AsyncClient(timeout=10.0) as client:
-                res = await client.get(url, params=params)
+                res = await self._request_with_retry(client, "GET", url, params=params)
                 data = res.json()
                 if res.status_code == 200:
                     return {

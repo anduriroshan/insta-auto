@@ -14,6 +14,7 @@ from api.routes_auth import router as auth_router
 from api.routes_rules import router as rules_router
 from api.routes_logs import router as logs_router
 from api.routes_settings import router as settings_router
+from api.routes_media import router as media_router
 
 # Setup logging
 logging.basicConfig(
@@ -55,6 +56,7 @@ app.include_router(auth_router)
 app.include_router(rules_router)
 app.include_router(logs_router)
 app.include_router(settings_router)
+app.include_router(media_router)
 
 # Mount frontend directory for static assets and dashboard
 frontend_dir = os.path.join(os.path.dirname(__file__), "frontend")

@@ -1,8 +1,10 @@
 import logging
 from fastapi import APIRouter, Request, Response, HTTPException, Depends
 from sqlmodel import Session
+from sqlalchemy.exc import IntegrityError
 from config import settings
 from core.database import get_session
+from core.models import ProcessedEvent
 from bot.webhook import verify_hub_token, verify_signature, parse_webhook_payload
 from bot.handlers import EventHandler, create_and_broadcast_log
 
@@ -60,6 +62,18 @@ async def meta_webhook_events(request: Request, session: Session = Depends(get_s
 
     for event in events:
         try:
+            # Meta delivers webhooks at-least-once and will redeliver on timeout/retry.
+            # Record the event id up front so a redelivered comment/message can't trigger
+            # a duplicate DM or public reply.
+            if event.event_id:
+                try:
+                    session.add(ProcessedEvent(event_id=event.event_id, event_type=event.event_type))
+                    session.commit()
+                except IntegrityError:
+                    session.rollback()
+                    logger.info(f"Skipping duplicate webhook event: {event.event_id}")
+                    continue
+
             if event.event_type == "dm":
                 await EventHandler.handle_dm(event, session)
             elif event.event_type == "comment":
