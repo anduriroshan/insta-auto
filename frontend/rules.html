@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Rules | Instagram Creator Automator</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div>
+                <div class="brand">
+                    <div class="brand-icon">⚡</div>
+                    <div>
+                        <div class="brand-title">InstaAuto</div>
+                        <div class="brand-subtitle">Creator Suite</div>
+                    </div>
+                </div>
+
+                <nav class="nav-menu">
+                    <a href="/static/dashboard.html" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                    <a href="/static/rules.html" class="nav-link active">
+                        <span class="nav-icon">⚡</span>
+                        <span class="nav-text">Automation Rules</span>
+                    </a>
+                    <a href="/static/logs.html" class="nav-link">
+                        <span class="nav-icon">📜</span>
+                        <span class="nav-text">Activity Logs</span>
+                    </a>
+                    <a href="/static/settings.html" class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-text">Settings & Setup</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    <span>Rules Engine Active</span>
+                </div>
+                <button class="btn-logout" id="btn-logout">
+                    <span>🚪</span>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="top-header">
+                <div>
+                    <h1 class="page-title">Automation Rules</h1>
+                    <p class="page-subtitle">Configure keyword triggers, follow gates, and auto-replies</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="btn-open-simulator">
+                        <span>🧪</span> <span>Test / Simulate</span>
+                    </button>
+                    <button class="btn btn-primary" id="btn-add-rule">
+                        <span>➕</span> <span>Create Rule</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Rules Table Card -->
+            <div class="glass-card">
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Rule Name</th>
+                                <th>Keywords</th>
+                                <th>Type</th>
+                                <th>Follow Gate</th>
+                                <th>Triggers</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rules-table-body">
+                            <tr>
+                                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                                    Loading automation rules...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Rule Modal -->
+    <div class="modal-backdrop" id="rule-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Create Automation Rule</h3>
+                <button class="modal-close" id="btn-close-modal">&times;</button>
+            </div>
+
+            <form id="rule-form">
+                <input type="hidden" id="rule-id">
+
+                <div class="form-group">
+                    <label class="form-label" for="rule-name">Rule Friendly Name</label>
+                    <input type="text" id="rule-name" class="form-input" placeholder="e.g., Free Creator Guide Delivery" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="rule-keywords">Trigger Keywords (comma separated)</label>
+                    <input type="text" id="rule-keywords" class="form-input" placeholder="e.g. guide, ebook, link, freebie" required>
+                    <p class="form-help">Users typing any of these keywords will trigger this automation.</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label class="form-label" for="rule-type">Applies To</label>
+                        <select id="rule-type" class="form-select">
+                            <option value="all">All (DMs, Comments & Stories)</option>
+                            <option value="dm">Direct Messages (DMs) Only</option>
+                            <option value="comment">Comments on Posts/Reels Only</option>
+                            <option value="story">Story Mentions Only</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="rule-match-type">Keyword Match Mode</label>
+                        <select id="rule-match-type" class="form-select">
+                            <option value="contains">Contains (e.g. "send guide please")</option>
+                            <option value="exact">Exact Match Only (e.g. "guide")</option>
+                            <option value="regex">Regular Expression (Regex)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="rule-response">Response Message (Auto-Reply)</label>
+                    <textarea id="rule-response" class="form-textarea" placeholder="Hey! Thanks for commenting! Here is your exclusive download link: https://yourlink.com/free 🚀" required></textarea>
+                    <p class="form-help">This message will be sent to the user via Instagram DM.</p>
+                </div>
+
+                <!-- Follow Gate Section -->
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 18px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <div>
+                            <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">🚪 Enable Follow Gate</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">Require users to follow your page before receiving the reward link</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="rule-follow-gate">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div id="follow-gate-options" style="display: none; margin-top: 14px;">
+                        <label class="form-label" for="rule-gate-message">Message to Non-Followers</label>
+                        <textarea id="rule-gate-message" class="form-textarea" style="min-height: 70px;" placeholder="Hey there! 👋 Please follow our page first, then send the keyword again to receive your free download! ✨"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="rule-cooldown">Cooldown Per User (Minutes)</label>
+                    <input type="number" id="rule-cooldown" class="form-input" value="1440" min="0">
+                    <p class="form-help">Prevents spamming the same user. 1440 = 24 hours. 0 = no cooldown.</p>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-rule">Save Automation Rule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Simulator Modal -->
+    <div class="modal-backdrop" id="simulator-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">🧪 Test & Simulate Rule Matching</h3>
+                <button class="modal-close" id="btn-close-sim">&times;</button>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 20px;">
+                Enter a sample incoming message to test which of your active rules will trigger.
+            </p>
+            <div class="form-group">
+                <label class="form-label">Incoming Message Text</label>
+                <input type="text" id="sim-input" class="form-input" placeholder="e.g., Can you send me the free guide?">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Event Channel</label>
+                <select id="sim-channel" class="form-select">
+                    <option value="dm">Direct Message (DM)</option>
+                    <option value="comment">Comment on Post</option>
+                    <option value="story">Story Mention</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" id="btn-run-sim" style="width: 100%; justify-content: center; margin-bottom: 20px;">
+                Evaluate Matches
+            </button>
+            <div id="sim-results" style="display: none; padding: 16px; border-radius: var(--radius-md); background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass);">
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/rules.js"></script>
+</body>
+</html>

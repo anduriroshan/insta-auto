@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Logs | Instagram Creator Automator</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .filter-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .filter-pill {
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-pill:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+        }
+
+        .filter-pill.active {
+            background: rgba(220, 39, 67, 0.2);
+            border-color: rgba(220, 39, 67, 0.5);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div>
+                <div class="brand">
+                    <div class="brand-icon">⚡</div>
+                    <div>
+                        <div class="brand-title">InstaAuto</div>
+                        <div class="brand-subtitle">Creator Suite</div>
+                    </div>
+                </div>
+
+                <nav class="nav-menu">
+                    <a href="/static/dashboard.html" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                    <a href="/static/rules.html" class="nav-link">
+                        <span class="nav-icon">⚡</span>
+                        <span class="nav-text">Automation Rules</span>
+                    </a>
+                    <a href="/static/logs.html" class="nav-link active">
+                        <span class="nav-icon">📜</span>
+                        <span class="nav-text">Activity Logs</span>
+                    </a>
+                    <a href="/static/settings.html" class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-text">Settings & Setup</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    <span id="sse-status-label">Stream Connected</span>
+                </div>
+                <button class="btn-logout" id="btn-logout">
+                    <span>🚪</span>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="top-header">
+                <div>
+                    <h1 class="page-title">Activity Logs</h1>
+                    <p class="page-subtitle">Real-time audit log of all Instagram DMs, comments, and triggers</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="btn-refresh-logs">
+                        <span>🔄</span> <span>Refresh</span>
+                    </button>
+                    <button class="btn btn-danger" id="btn-clear-logs">
+                        <span>🗑️</span> <span>Clear History</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="filter-pills">
+                <button class="filter-pill active" data-filter="">All Events</button>
+                <button class="filter-pill" data-filter="dm_sent">Direct Replies</button>
+                <button class="filter-pill" data-filter="private_reply_sent">Comment Replies</button>
+                <button class="filter-pill" data-filter="follow_gate_blocked">Follow Gates</button>
+                <button class="filter-pill" data-filter="story_mention">Story Mentions</button>
+                <button class="filter-pill" data-filter="queued_released">Follow Unlocks</button>
+                <button class="filter-pill" data-filter="error">Errors</button>
+            </div>
+
+            <!-- Logs Table Card -->
+            <div class="glass-card">
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Event Type</th>
+                                <th>Instagram User</th>
+                                <th>Rule</th>
+                                <th>Status</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-table-body">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                                    Loading activity logs...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/logs.js"></script>
+</body>
+</html>

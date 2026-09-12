@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings & Setup Guide | Instagram Creator Automator</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div>
+                <div class="brand">
+                    <div class="brand-icon">⚡</div>
+                    <div>
+                        <div class="brand-title">InstaAuto</div>
+                        <div class="brand-subtitle">Creator Suite</div>
+                    </div>
+                </div>
+
+                <nav class="nav-menu">
+                    <a href="/static/dashboard.html" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                    <a href="/static/rules.html" class="nav-link">
+                        <span class="nav-icon">⚡</span>
+                        <span class="nav-text">Automation Rules</span>
+                    </a>
+                    <a href="/static/logs.html" class="nav-link">
+                        <span class="nav-icon">📜</span>
+                        <span class="nav-text">Activity Logs</span>
+                    </a>
+                    <a href="/static/settings.html" class="nav-link active">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-text">Settings & Setup</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    <span>Settings Ready</span>
+                </div>
+                <button class="btn-logout" id="btn-logout">
+                    <span>🚪</span>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="top-header">
+                <div>
+                    <h1 class="page-title">Settings & Meta Setup Guide</h1>
+                    <p class="page-subtitle">Configure credentials, test API connections, and setup ice breakers</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="btn-test-conn">
+                        <span>🔌</span> <span>Test Meta Connection</span>
+                    </button>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 28px;">
+                <!-- Left Column: Credentials Form -->
+                <div>
+                    <div class="glass-card" style="margin-bottom: 24px;">
+                        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px;">
+                            🔑 Meta Graph API Credentials
+                        </h3>
+
+                        <form id="settings-form">
+                            <div class="form-group">
+                                <label class="form-label" for="meta-app-id">Meta App ID</label>
+                                <input type="text" id="meta-app-id" class="form-input" placeholder="e.g. 123456789012345">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="meta-app-secret">Meta App Secret</label>
+                                <input type="password" id="meta-app-secret" class="form-input" placeholder="Enter App Secret (leave empty to keep current)">
+                                <p class="form-help">Used to cryptographically verify incoming webhook signatures.</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="page-access-token">Page Access Token (Permanent / Long-Lived)</label>
+                                <input type="password" id="page-access-token" class="form-input" placeholder="EAAB... (leave empty to keep current)">
+                                <p class="form-help" id="token-status-help">Current status: Not Set</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="instagram-account-id">Instagram Business Account ID</label>
+                                <input type="text" id="instagram-account-id" class="form-input" placeholder="e.g. 17841400000000000">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="webhook-verify-token">Webhook Verify Token</label>
+                                <input type="text" id="webhook-verify-token" class="form-input" placeholder="my_secure_custom_verify_token_123">
+                                <p class="form-help">Must match the Verify Token entered in the Meta App Dashboard.</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="webhook-base-url">Public Webhook Base URL (e.g. Cloudflare / ngrok)</label>
+                                <input type="text" id="webhook-base-url" class="form-input" placeholder="https://your-tunnel.ngrok-free.app">
+                                <p class="form-help">Your public HTTPS URL so Meta can deliver webhook events to your machine.</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="dashboard-pwd">Dashboard Password</label>
+                                <input type="password" id="dashboard-pwd" class="form-input" placeholder="Change dashboard password">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                                Save Settings to .env
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Ice Breakers Card -->
+                    <div class="glass-card">
+                        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 6px;">
+                            ❄️ Conversation Starters (Ice Breakers)
+                        </h3>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 18px;">
+                            FAQ buttons displayed in the Instagram DM screen for new visitors. Clicking a button automatically triggers matching keyword rules!
+                        </p>
+
+                        <div id="ice-breakers-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                            <div class="form-group" style="margin-bottom: 8px;">
+                                <input type="text" class="form-input ice-q" placeholder="Button 1: 🎁 Get Free Creator Guide" value="🎁 Get Free Creator Guide">
+                                <input type="text" class="form-input ice-p" style="margin-top: 6px; font-family: monospace;" placeholder="Payload/Keyword: GUIDE" value="GUIDE">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 8px;">
+                                <input type="text" class="form-input ice-q" placeholder="Button 2: 💰 Price & Services" value="💰 Price & Services">
+                                <input type="text" class="form-input ice-p" style="margin-top: 6px; font-family: monospace;" placeholder="Payload/Keyword: PRICE" value="PRICE">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-secondary" id="btn-save-icebreakers" style="width: 100%; justify-content: center;">
+                            Publish Ice Breakers to Instagram
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column: Meta Setup Instructions -->
+                <div>
+                    <div class="glass-card">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                            <span style="font-size: 1.6rem;">📖</span>
+                            <div>
+                                <h3 style="font-size: 1.2rem; font-weight: 700;">Meta Developer Setup Guide</h3>
+                                <p style="font-size: 0.82rem; color: var(--accent-cyan);">Zero Ban Risk • 100% Free Official Setup</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 1 -->
+                        <div class="accordion-item active">
+                            <div class="accordion-header">
+                                <span>1. Link Instagram to a Facebook Page</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="accordion-body">
+                                1. Open your Instagram mobile app.<br>
+                                2. Go to <strong>Settings & Privacy &gt; Account Type & Tools</strong> &gt; Switch to <strong>Professional Account</strong> (Creator or Business).<br>
+                                3. Go to <strong>Edit Profile &gt; Public Business Information &gt; Page</strong> and link to any Facebook Page you own (create a free page if needed).
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>2. Create a Free Meta App</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="accordion-body">
+                                1. Visit <a href="https://developers.facebook.com" target="_blank" style="color: var(--accent-cyan);">developers.facebook.com</a> and sign in.<br>
+                                2. Click <strong>My Apps &gt; Create App</strong>.<br>
+                                3. Select <strong>Other</strong> &gt; choose <strong>Business</strong> as the app type.<br>
+                                4. Enter an App Name (e.g. <code>My Instagram Automator</code>) and complete creation.<br>
+                                5. Copy your <strong>App ID</strong> and <strong>App Secret</strong> into the form on the left.
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>3. Add Instagram & Messenger Products</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="accordion-body">
+                                1. In your Meta App Dashboard, click <strong>Add Product</strong>.<br>
+                                2. Find and add <strong>Instagram Graph API</strong>.<br>
+                                3. Also add <strong>Messenger</strong> product to the app.
+                            </div>
+                        </div>
+
+                        <!-- Step 4 -->
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>4. Generate Page Access Token</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="accordion-body">
+                                1. In the left menu, click <strong>Tools &gt; Graph API Explorer</strong>.<br>
+                                2. In <strong>Meta App</strong>, select your newly created app.<br>
+                                3. In <strong>User or Page</strong>, select your Facebook Page.<br>
+                                4. Add the permissions:
+                                   <ul style="margin: 8px 0 8px 20px; color: #fff;">
+                                       <li><code>instagram_manage_messages</code></li>
+                                       <li><code>instagram_manage_comments</code></li>
+                                       <li><code>pages_manage_metadata</code></li>
+                                       <li><code>pages_read_engagement</code></li>
+                                   </ul>
+                                5. Click <strong>Generate Access Token</strong> and paste it into the left form.
+                            </div>
+                        </div>
+
+                        <!-- Step 5 -->
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>5. Expose Webhook URL (ngrok)</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="accordion-body">
+                                If developing locally on your PC, expose port 8000 via ngrok or Cloudflare Tunnel:
+                                <div class="code-box">
+                                    <span>ngrok http 8000</span>
+                                </div>
+                                Copy the resulting <code>https://....ngrok-free.app</code> into the "Public Webhook Base URL" field on the left.
+                            </div>
+                        </div>
+
+                        <!-- Step 6 -->
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>6. Configure Webhook in Meta</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="accordion-body">
+                                1. In Meta Developer Dashboard, click <strong>Webhooks</strong> in the left sidebar.<br>
+                                2. Under the dropdown, select <strong>Instagram</strong>.<br>
+                                3. Click <strong>Edit Subscription</strong> / <strong>Add Callback URL</strong>.<br>
+                                4. Paste your Callback URL: <code>https://your-tunnel.ngrok-free.app/webhook</code><br>
+                                5. Enter your Verify Token: <code>my_secure_custom_verify_token_123</code><br>
+                                6. Click <strong>Verify and Save</strong>.<br>
+                                7. Subscribe to the <strong>messages</strong> and <strong>comments</strong> fields. Done! 🎉
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/settings.js"></script>
+</body>
+</html>

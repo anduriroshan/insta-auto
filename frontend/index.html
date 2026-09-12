@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Instagram Creator Automation</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .login-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(18, 20, 36, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-glass-bright);
+            border-radius: var(--radius-lg);
+            padding: 40px 32px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-ig-gradient);
+        }
+
+        .login-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            background: var(--accent-ig-gradient);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: var(--shadow-glow);
+            margin-bottom: 20px;
+            animation: pulseGlow 4s infinite alternate;
+        }
+
+        .login-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .login-desc {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .btn-toggle-pwd {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .login-footer {
+            margin-top: 24px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-logo">⚡</div>
+            <h1 class="login-title">Creator Automator</h1>
+            <p class="login-desc">Official Meta Graph API • Self-Hosted Suite</p>
+
+            <form id="login-form">
+                <div class="form-group" style="text-align: left;">
+                    <label class="form-label" for="password">Dashboard Password</label>
+                    <div class="password-container">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            class="form-input" 
+                            placeholder="Enter password (default: admin123)" 
+                            required
+                            autocomplete="current-password"
+                        >
+                        <button type="button" class="btn-toggle-pwd" id="btn-toggle-pwd">👁️</button>
+                    </div>
+                    <p class="form-help">Configured in your <code>.env</code> file</p>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-login" id="btn-submit">
+                    <span>Access Dashboard</span> <span>→</span>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                100% Free & Self-Hosted • Zero Meta Ban Risk
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        const loginForm = document.getElementById("login-form");
+        const pwdInput = document.getElementById("password");
+        const toggleBtn = document.getElementById("btn-toggle-pwd");
+        const submitBtn = document.getElementById("btn-submit");
+
+        toggleBtn.addEventListener("click", () => {
+            if (pwdInput.type === "password") {
+                pwdInput.type = "text";
+                toggleBtn.textContent = "🙈";
+            } else {
+                pwdInput.type = "password";
+                toggleBtn.textContent = "👁️";
+            }
+        });
+
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const password = pwdInput.value;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span>Authenticating...</span>`;
+
+            try {
+                const res = await apiFetch("/api/auth/login", {
+                    method: "POST",
+                    body: JSON.stringify({ password })
+                });
+
+                setToken(res.access_token);
+                showToast("Welcome back! Redirecting...", "success");
+                setTimeout(() => {
+                    window.location.href = "/static/dashboard.html";
+                }, 400);
+            } catch (err) {
+                showToast(err.message || "Invalid password", "error");
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span>Access Dashboard</span> <span>→</span>`;
+            }
+        });
+    </script>
+</body>
+</html>
