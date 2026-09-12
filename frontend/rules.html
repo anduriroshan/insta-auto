@@ -7,10 +7,9 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div>
+        <!-- Top Navigation -->
+        <header class="topbar">
+            <div class="topbar-left">
                 <div class="brand">
                     <div class="brand-icon">⚡</div>
                     <div>
@@ -49,7 +48,7 @@
                     <span>Sign Out</span>
                 </button>
             </div>
-        </aside>
+        </header>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -70,7 +69,7 @@
             </div>
 
             <!-- Rules Table Card -->
-            <div class="glass-card">
+            <div class="card">
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
@@ -78,15 +77,17 @@
                                 <th>Status</th>
                                 <th>Rule Name</th>
                                 <th>Keywords</th>
-                                <th>Type</th>
+                                <th>Response Type</th>
+                                <th>Scope</th>
+                                <th>Public Reply</th>
                                 <th>Follow Gate</th>
-                                <th>Triggers</th>
-                                <th>Actions</th>
+                                <th style="text-align:right">Triggers</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody id="rules-table-body">
                             <tr>
-                                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                                <td colspan="9" class="empty-state">
                                     Loading automation rules...
                                 </td>
                             </tr>
@@ -95,7 +96,6 @@
                 </div>
             </div>
         </main>
-    </div>
 
     <!-- Add/Edit Rule Modal -->
     <div class="modal-backdrop" id="rule-modal">
@@ -107,6 +107,8 @@
 
             <form id="rule-form">
                 <input type="hidden" id="rule-id">
+                <input type="hidden" id="rule-target-media-id">
+                <input type="hidden" id="rule-target-media-permalink">
 
                 <div class="form-group">
                     <label class="form-label" for="rule-name">Rule Friendly Name</label>
@@ -146,12 +148,48 @@
                     <p class="form-help">This message will be sent to the user via Instagram DM.</p>
                 </div>
 
-                <!-- Follow Gate Section -->
-                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 18px; margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <!-- Media Scope Section -->
+                <div class="form-group">
+                    <label class="form-label">Media Scope</label>
+                    <p class="form-help" style="margin-top: -4px; margin-bottom: 12px;">Match this rule anywhere, or pin it to one specific reel/post's comments.</p>
+
+                    <div class="media-picker-toolbar" id="media-scope-toolbar">
+                        <button type="button" class="active" data-scope="all">All posts</button>
+                        <button type="button" data-scope="specific">Specific post</button>
+                    </div>
+
+                    <div id="media-picker-grid" class="media-grid" style="display: none;">
+                        <div class="media-picker-empty">Loading recent media…</div>
+                    </div>
+
+                    <div class="selected-scope-hint" id="media-scope-hint" style="display: none;"></div>
+                </div>
+
+                <!-- Public Reply Section -->
+                <div class="toggle-section">
+                    <div class="toggle-section-head">
                         <div>
-                            <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">🚪 Enable Follow Gate</div>
-                            <div style="font-size: 0.8rem; color: var(--text-secondary);">Require users to follow your page before receiving the reward link</div>
+                            <div class="toggle-section-title">💬 Public Reply</div>
+                            <div class="toggle-section-desc">Also post a public comment reply, in addition to the DM (comment rules only)</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="rule-public-reply">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div id="public-reply-options" style="display: none;" class="toggle-section-body">
+                        <label class="form-label" for="rule-public-reply-text">Public Reply Text</label>
+                        <textarea id="rule-public-reply-text" class="form-textarea" style="min-height: 60px;" placeholder="Sent you the link! 📬 Check your DMs."></textarea>
+                    </div>
+                </div>
+
+                <!-- Follow Gate Section -->
+                <div class="toggle-section">
+                    <div class="toggle-section-head">
+                        <div>
+                            <div class="toggle-section-title">🚪 Enable Follow Gate</div>
+                            <div class="toggle-section-desc">Require users to follow your page before receiving the reward link</div>
                         </div>
                         <label class="switch">
                             <input type="checkbox" id="rule-follow-gate">
@@ -159,7 +197,7 @@
                         </label>
                     </div>
 
-                    <div id="follow-gate-options" style="display: none; margin-top: 14px;">
+                    <div id="follow-gate-options" style="display: none;" class="toggle-section-body">
                         <label class="form-label" for="rule-gate-message">Message to Non-Followers</label>
                         <textarea id="rule-gate-message" class="form-textarea" style="min-height: 70px;" placeholder="Hey there! 👋 Please follow our page first, then send the keyword again to receive your free download! ✨"></textarea>
                     </div>
@@ -204,7 +242,7 @@
             <button class="btn btn-primary" id="btn-run-sim" style="width: 100%; justify-content: center; margin-bottom: 20px;">
                 Evaluate Matches
             </button>
-            <div id="sim-results" style="display: none; padding: 16px; border-radius: var(--radius-md); background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass);">
+            <div id="sim-results" style="display: none; padding: 16px; border-radius: var(--radius-md); background: var(--surface-2); border: 1px solid var(--border);">
             </div>
         </div>
     </div>

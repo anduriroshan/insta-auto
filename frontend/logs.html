@@ -5,43 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Activity Logs | Instagram Creator Automator</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <style>
-        .filter-pills {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-
-        .filter-pill {
-            padding: 8px 16px;
-            border-radius: var(--radius-full);
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-glass);
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .filter-pill:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-primary);
-        }
-
-        .filter-pill.active {
-            background: rgba(220, 39, 67, 0.2);
-            border-color: rgba(220, 39, 67, 0.5);
-            color: #fff;
-        }
-    </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div>
+        <!-- Top Navigation -->
+        <header class="topbar">
+            <div class="topbar-left">
                 <div class="brand">
                     <div class="brand-icon">⚡</div>
                     <div>
@@ -80,7 +48,7 @@
                     <span>Sign Out</span>
                 </button>
             </div>
-        </aside>
+        </header>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -112,7 +80,7 @@
             </div>
 
             <!-- Logs Table Card -->
-            <div class="glass-card">
+            <div class="card">
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
@@ -136,7 +104,6 @@
                 </div>
             </div>
         </main>
-    </div>
 
     <script src="/static/js/app.js"></script>
     <script src="/static/js/logs.js"></script>

@@ -41,10 +41,10 @@ function renderLogRow(log) {
             <span class="badge ${typeBadge}">${icon} ${log.event_type}</span>
         </td>
         <td>
-            <strong style="color: #fff;">${userDisplay}</strong>
+            <strong style="color: var(--text-primary);">${userDisplay}</strong>
         </td>
         <td>
-            <span style="color: var(--accent-cyan); font-size: 0.85rem;">${log.rule_name || '-'}</span>
+            <span style="color: var(--text-primary); font-size: 0.85rem;">${log.rule_name || '-'}</span>
         </td>
         <td>
             <span class="badge ${statusBadge}">${log.status}</span>

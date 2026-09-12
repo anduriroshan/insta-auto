@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup A — Ledger | Rules</title>
+<style>
+/* ============================================================
+   DIRECTION A — "LEDGER"
+   A dense, operational console modeled on Linear's issue views.
+   Premise: this page is used daily by someone triaging dozens of
+   rules — optimize for scan speed and information density over
+   whitespace. Sharp 4px geometry, hairline dividers instead of
+   boxed cards, monospace for anything countable/identifiable
+   (ids, keyword tokens, trigger counts), a single vivid accent
+   used only for the primary action and active/selected states.
+   ============================================================ */
+
+:root {
+  /* --- surfaces --- */
+  --bg:            #0c0c0d;
+  --bg-inset:       #08080a;   /* inputs, recessed wells */
+  --bg-raised:      #ondit;
+  --surface:        #141416;   /* sidebar, header row */
+  --surface-hover:  #1a1a1d;
+  --border:         #232326;
+  --border-strong:  #323236;
+
+  /* --- text --- */
+  --text-1: #f2f2f3;
+  --text-2: #9a9aa1;
+  --text-3: #5c5c62;
+
+  /* --- brand accent (single, functional) --- */
+  --accent:      #ff5a36;
+  --accent-dim:  #7a2c1c;
+  --accent-tint: rgba(255, 90, 54, 0.12);
+  --accent-ink:  #ffb199;
+
+  /* --- semantic (separate from brand accent) --- */
+  --success:      #3fb950;
+  --success-tint: rgba(63, 185, 80, 0.12);
+  --warning:      #d29922;
+  --warning-tint: rgba(210, 153, 34, 0.12);
+  --error:        #f85149;
+  --error-tint:   rgba(248, 81, 73, 0.12);
+  --neutral:      #8b8b93;
+  --neutral-tint: rgba(139, 139, 147, 0.12);
+
+  /* --- type scale (dense) --- */
+  --fs-11: 11px;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-15: 15px;
+  --fs-18: 18px;
+  --fs-24: 24px;
+
+  --font-ui:   -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Consolas", monospace;
+
+  /* --- spacing grid --- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 28px;
+  --sp-7: 40px;
+
+  /* --- geometry --- */
+  --r-sm: 3px;
+  --r-md: 4px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-size: var(--fs-13);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--accent-dim); color: #fff; }
+
+/* meta banner explaining the exploration — not part of the app itself */
+.mockup-banner {
+  background: var(--surface);
+  border-bottom: 1px dashed var(--border-strong);
+  color: var(--text-2);
+  font-size: var(--fs-12);
+  padding: var(--sp-2) var(--sp-6);
+  display: flex;
+  gap: var(--sp-4);
+  align-items: baseline;
+}
+.mockup-banner strong { color: var(--text-1); font-weight: 600; }
+.mockup-banner code { font-family: var(--font-mono); color: var(--accent-ink); }
+
+.shell {
+  display: grid;
+  grid-template-columns: 216px 1fr;
+  min-height: 100vh;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: var(--sp-5) var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-2) var(--sp-5) var(--sp-2);
+}
+.brand-mark {
+  width: 22px; height: 22px;
+  border-radius: var(--r-md);
+  background: var(--accent);
+  flex-shrink: 0;
+}
+.brand-name { font-size: var(--fs-13); font-weight: 600; color: var(--text-1); }
+.brand-sub { font-size: 11px; color: var(--text-3); }
+
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 7px var(--sp-2);
+  border-radius: var(--r-md);
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: var(--fs-13);
+  font-weight: 500;
+  border-left: 2px solid transparent;
+}
+.nav-link svg { width: 15px; height: 15px; stroke: currentColor; flex-shrink: 0; }
+.nav-link:hover { color: var(--text-1); background: var(--surface-hover); }
+.nav-link.active {
+  color: var(--text-1);
+  background: var(--surface-hover);
+  border-left: 2px solid var(--accent);
+  font-weight: 600;
+}
+
+.side-foot { display: flex; flex-direction: column; gap: var(--sp-3); }
+.side-status {
+  display: flex; align-items: center; gap: var(--sp-2);
+  font-size: var(--fs-12); color: var(--text-2);
+  padding: var(--sp-1) var(--sp-2);
+  border-top: 1px solid var(--border);
+  padding-top: var(--sp-3);
+}
+.dot { width: 6px; height: 6px; border-radius: 1px; background: var(--success); }
+
+/* ---------- main ---------- */
+.main { padding: var(--sp-6) var(--sp-7); max-width: 1180px; }
+
+.pagehead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: var(--sp-6);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border);
+}
+.pagehead h1 { font-size: var(--fs-18); font-weight: 600; letter-spacing: -0.2px; }
+.pagehead p { font-size: var(--fs-13); color: var(--text-2); margin-top: 2px; }
+.actions { display: flex; gap: var(--sp-2); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 30px; padding: 0 var(--sp-3);
+  border-radius: var(--r-md);
+  font-size: var(--fs-13); font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+.btn svg { width: 14px; height: 14px; stroke: currentColor; }
+.btn-primary { background: var(--accent); color: #1a0803; font-weight: 600; }
+.btn-primary:hover { background: #ff6d4b; }
+.btn-secondary { background: transparent; border-color: var(--border-strong); color: var(--text-1); }
+.btn-secondary:hover { border-color: var(--text-3); background: var(--surface-hover); }
+.icon-btn {
+  width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-sm); background: transparent; border: 1px solid transparent;
+  color: var(--text-2); cursor: pointer;
+}
+.icon-btn:hover { background: var(--surface-hover); border-color: var(--border); color: var(--text-1); }
+.icon-btn.danger:hover { color: var(--error); }
+.icon-btn svg { width: 14px; height: 14px; stroke: currentColor; }
+
+/* ---------- section label divider ---------- */
+.section-label {
+  display: flex; align-items: center; gap: var(--sp-3);
+  margin: var(--sp-7) 0 var(--sp-4);
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ---------- table ---------- */
+.table-wrap { border-top: 1px solid var(--border); }
+table.rules-table { width: 100%; border-collapse: collapse; }
+.rules-table thead th {
+  text-align: left;
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text-3);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.rules-table tbody td {
+  padding: 10px var(--sp-3);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  font-size: var(--fs-13);
+}
+.rules-table tbody tr:hover td { background: var(--surface-hover); }
+
+.rule-name { color: var(--text-1); font-weight: 500; }
+.rule-id { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); margin-left: 6px; }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 4px; max-width: 220px; }
+.chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-2);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 2px 6px;
+}
+
+.type-cell { display: flex; align-items: center; gap: 6px; color: var(--text-2); }
+.type-cell svg { width: 13px; height: 13px; stroke: currentColor; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600;
+  padding: 3px 7px;
+  border-radius: var(--r-sm);
+  white-space: nowrap;
+}
+.badge .dot2 { width: 5px; height: 5px; border-radius: 1px; }
+.badge-scoped { background: var(--accent-tint); color: var(--accent-ink); }
+.badge-scoped .dot2 { background: var(--accent); }
+.badge-allposts { background: var(--neutral-tint); color: var(--text-2); }
+.badge-allposts .dot2 { background: var(--neutral); }
+.badge-on { background: var(--success-tint); color: #7ee08a; }
+.badge-on .dot2 { background: var(--success); }
+.badge-off { background: var(--neutral-tint); color: var(--text-3); }
+.badge-off .dot2 { background: var(--text-3); }
+.badge-gate { background: var(--warning-tint); color: #eab84f; }
+.badge-gate .dot2 { background: var(--warning); }
+
+.trigger-count { font-family: var(--font-mono); font-weight: 600; color: var(--text-1); }
+.trigger-sub { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+
+.switch { position: relative; display: inline-block; width: 28px; height: 16px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch .track {
+  position: absolute; inset: 0; background: var(--border-strong);
+  border-radius: 2px; transition: background .15s;
+}
+.switch .track::before {
+  content: ''; position: absolute; width: 12px; height: 12px; left: 2px; top: 2px;
+  background: var(--text-2); border-radius: 1px; transition: transform .15s, background .15s;
+}
+.switch input:checked + .track { background: var(--accent-dim); }
+.switch input:checked + .track::before { transform: translateX(12px); background: var(--accent); }
+
+.row-actions { display: flex; gap: 4px; justify-content: flex-end; }
+
+/* ---------- editor ---------- */
+.editor {
+  border-top: 1px solid var(--border);
+}
+.editor-group {
+  padding: var(--sp-5) 0;
+  border-bottom: 1px solid var(--border);
+}
+.editor-group-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text-3); margin-bottom: var(--sp-4);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: var(--sp-5);
+  padding: var(--sp-3) 0;
+  align-items: start;
+}
+.field-row + .field-row { border-top: 1px solid var(--border); }
+.field-label { font-size: var(--fs-13); color: var(--text-1); font-weight: 500; padding-top: 7px; }
+.field-hint { font-size: 11px; color: var(--text-3); margin-top: 4px; max-width: 200px; }
+.field-control { max-width: 520px; }
+
+input[type=text], input[type=number], textarea, select {
+  width: 100%;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-size: var(--fs-13);
+  padding: 7px 10px;
+  outline: none;
+}
+textarea { resize: vertical; min-height: 76px; line-height: 1.5; }
+input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+::placeholder { color: var(--text-3); }
+
+.tag-input-box {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 6px 8px;
+}
+.tag-input-box:focus-within { border-color: var(--accent); }
+.kw-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-mono); font-size: 12px;
+  background: var(--surface); border: 1px solid var(--border-strong);
+  color: var(--text-1); border-radius: var(--r-sm); padding: 3px 6px;
+}
+.kw-chip svg { width: 10px; height: 10px; stroke: currentColor; cursor: pointer; color: var(--text-3); }
+.kw-chip svg:hover { color: var(--error); }
+.tag-input-box input {
+  border: none; background: transparent; flex: 1; min-width: 90px; padding: 3px 2px;
+}
+
+.select-inline { display: inline-flex; align-items: center; gap: 8px; }
+select { width: auto; appearance: none; padding-right: 28px; background-image: none; }
+.select-wrap { position: relative; display: inline-block; }
+.select-wrap svg {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 12px; height: 12px; stroke: var(--text-3); pointer-events: none;
+}
+
+/* media scope picker */
+.media-scroll { display: flex; gap: 8px; flex-wrap: wrap; }
+.media-tile {
+  position: relative;
+  width: 76px; height: 76px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: #1c1c1f;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.media-tile.selected { border: 2px solid var(--accent); }
+.media-tile.all-posts {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; background: var(--bg-inset);
+}
+.media-tile.all-posts span { font-size: 10px; color: var(--text-2); font-weight: 600; text-align: center; padding: 0 4px; }
+.media-tile.all-posts svg { width: 18px; height: 18px; stroke: var(--text-2); }
+.media-thumb-fill {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #202024;
+}
+.media-thumb-fill svg { width: 20px; height: 20px; stroke: var(--text-3); }
+.media-tile:nth-of-type(3) .media-thumb-fill { background: #23201f; }
+.media-tile:nth-of-type(4) .media-thumb-fill { background: #1e2220; }
+.media-tile:nth-of-type(5) .media-thumb-fill { background: #221e22; }
+.media-type-tag {
+  position: absolute; top: 3px; left: 3px;
+  font-family: var(--font-mono); font-size: 8px; font-weight: 700;
+  color: #fff; background: rgba(0,0,0,0.55);
+  padding: 1px 4px; border-radius: 2px; letter-spacing: 0.3px;
+}
+.media-check {
+  position: absolute; top: 3px; right: 3px;
+  width: 14px; height: 14px; border-radius: 2px;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+}
+.media-check svg { width: 9px; height: 9px; stroke: #1a0803; stroke-width: 3; }
+.media-caption {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 3px 4px 2px;
+  font-size: 9px; color: #e6e6e6;
+  background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.field-hint.selected-label { color: var(--text-2); margin-top: var(--sp-2); }
+.field-hint.selected-label strong { color: var(--accent-ink); font-family: var(--font-mono); font-weight: 600; }
+
+.toggle-row { display: flex; align-items: center; gap: var(--sp-3); }
+.toggle-row .field-label { padding-top: 0; }
+
+.editor-actions {
+  display: flex; justify-content: flex-end; gap: var(--sp-2);
+  padding-top: var(--sp-5);
+}
+</style>
+</head>
+<body>
+
+<div class="mockup-banner">
+  <span><strong>MOCKUP — Direction A: "Ledger"</strong></span>
+  <span>Dense operational console · sharp 4px geometry · hairline dividers instead of boxed cards · one accent (<code>#ff5a36</code>) reserved for primary action + active state · monospace for anything countable</span>
+</div>
+
+<!-- icon sprite, self-contained, no external requests -->
+<svg style="display:none">
+  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-all" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+</svg>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div>
+          <div class="brand-name">InstaAuto</div>
+          <div class="brand-sub">Creator Suite</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a class="nav-link" href="#"><svg><use href="#i-grid"/></svg> Dashboard</a>
+        <a class="nav-link active" href="#"><svg><use href="#i-bolt"/></svg> Automation Rules</a>
+        <a class="nav-link" href="#"><svg><use href="#i-list"/></svg> Activity Logs</a>
+        <a class="nav-link" href="#"><svg><use href="#i-settings"/></svg> Settings &amp; Setup</a>
+      </nav>
+    </div>
+    <div class="side-foot">
+      <div class="side-status"><span class="dot"></span> Rules engine active</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="pagehead">
+      <div>
+        <h1>Automation Rules</h1>
+        <p>Keyword triggers, follow gates, and auto-replies</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary"><svg><use href="#i-msg"/></svg> Simulate</button>
+        <button class="btn btn-primary"><svg><use href="#i-plus"/></svg> Create rule</button>
+      </div>
+    </div>
+
+    <!-- ============ 1. RULES TABLE ============ -->
+    <div class="section-label">01 &nbsp;Rules table</div>
+
+    <div class="table-wrap">
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th style="width:34px"></th>
+            <th>Rule</th>
+            <th>Keywords</th>
+            <th>Response type</th>
+            <th>Scope</th>
+            <th>Public reply</th>
+            <th>Follow gate</th>
+            <th style="text-align:right">Triggers</th>
+            <th style="width:64px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><label class="switch"><input type="checkbox" checked><span class="track"></span></label></td>
+            <td><span class="rule-name">Free Guide DM</span><span class="rule-id">#014</span></td>
+            <td><div class="chip-row"><span class="chip">guide</span><span class="chip">ebook</span><span class="chip">freebie</span></div></td>
+            <td><div class="type-cell"><svg><use href="#i-msg"/></svg> DM</div></td>
+            <td><span class="badge badge-allposts"><span class="dot2"></span>All posts</span></td>
+            <td><span class="badge badge-off"><span class="dot2"></span>Off</span></td>
+            <td><span class="badge badge-gate"><span class="dot2"></span>Required</span></td>
+            <td style="text-align:right"><div class="trigger-count">1,204</div><div class="trigger-sub">18/day avg</div></td>
+            <td><div class="row-actions"><button class="icon-btn"><svg><use href="#i-edit"/></svg></button><button class="icon-btn danger"><svg><use href="#i-trash"/></svg></button></div></td>
+          </tr>
+          <tr>
+            <td><label class="switch"><input type="checkbox" checked><span class="track"></span></label></td>
+            <td><span class="rule-name">Reel Giveaway Reply</span><span class="rule-id">#021</span></td>
+            <td><div class="chip-row"><span class="chip">giveaway</span><span class="chip">win</span></div></td>
+            <td><div class="type-cell"><svg><use href="#i-list"/></svg> Comment</div></td>
+            <td><span class="badge badge-scoped"><span class="dot2"></span>Summer Giveaway Reel</span></td>
+            <td><span class="badge badge-on"><span class="dot2"></span>On</span></td>
+            <td><span class="badge badge-off"><span class="dot2"></span>Open</span></td>
+            <td style="text-align:right"><div class="trigger-count">342</div><div class="trigger-sub">6/day avg</div></td>
+            <td><div class="row-actions"><button class="icon-btn"><svg><use href="#i-edit"/></svg></button><button class="icon-btn danger"><svg><use href="#i-trash"/></svg></button></div></td>
+          </tr>
+          <tr>
+            <td><label class="switch"><input type="checkbox"><span class="track"></span></label></td>
+            <td><span class="rule-name">Pricing Info</span><span class="rule-id">#009</span></td>
+            <td><div class="chip-row"><span class="chip">price</span><span class="chip">cost</span><span class="chip">how much</span></div></td>
+            <td><div class="type-cell"><svg><use href="#i-bolt"/></svg> All</div></td>
+            <td><span class="badge badge-allposts"><span class="dot2"></span>All posts</span></td>
+            <td><span class="badge badge-off"><span class="dot2"></span>Off</span></td>
+            <td><span class="badge badge-off"><span class="dot2"></span>Open</span></td>
+            <td style="text-align:right"><div class="trigger-count">89</div><div class="trigger-sub">2/day avg</div></td>
+            <td><div class="row-actions"><button class="icon-btn"><svg><use href="#i-edit"/></svg></button><button class="icon-btn danger"><svg><use href="#i-trash"/></svg></button></div></td>
+          </tr>
+          <tr>
+            <td><label class="switch"><input type="checkbox" checked><span class="track"></span></label></td>
+            <td><span class="rule-name">Story CTA</span><span class="rule-id">#003</span></td>
+            <td><div class="chip-row"><span class="chip">link</span><span class="chip">swipe</span></div></td>
+            <td><div class="type-cell"><svg><use href="#i-play"/></svg> Story</div></td>
+            <td><span class="badge badge-allposts"><span class="dot2"></span>All posts</span></td>
+            <td><span class="badge badge-off"><span class="dot2"></span>Off</span></td>
+            <td><span class="badge badge-gate"><span class="dot2"></span>Required</span></td>
+            <td style="text-align:right"><div class="trigger-count">27</div><div class="trigger-sub">&lt;1/day avg</div></td>
+            <td><div class="row-actions"><button class="icon-btn"><svg><use href="#i-edit"/></svg></button><button class="icon-btn danger"><svg><use href="#i-trash"/></svg></button></div></td>
+          </tr>
+          <tr>
+            <td><label class="switch"><input type="checkbox" checked><span class="track"></span></label></td>
+            <td><span class="rule-name">New Drop Comment</span><span class="rule-id">#027</span></td>
+            <td><div class="chip-row"><span class="chip">drop</span><span class="chip">restock</span></div></td>
+            <td><div class="type-cell"><svg><use href="#i-list"/></svg> Comment</div></td>
+            <td><span class="badge badge-scoped"><span class="dot2"></span>Product Drop Teaser</span></td>
+            <td><span class="badge badge-on"><span class="dot2"></span>On</span></td>
+            <td><span class="badge badge-off"><span class="dot2"></span>Open</span></td>
+            <td style="text-align:right"><div class="trigger-count">512</div><div class="trigger-sub">11/day avg</div></td>
+            <td><div class="row-actions"><button class="icon-btn"><svg><use href="#i-edit"/></svg></button><button class="icon-btn danger"><svg><use href="#i-trash"/></svg></button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ============ 2. RULE EDITOR ============ -->
+    <div class="section-label">02 &nbsp;Rule editor — "New Drop Comment"</div>
+
+    <div class="editor">
+
+      <div class="editor-group">
+        <div class="editor-group-label">Identity</div>
+        <div class="field-row">
+          <div class="field-label">Rule name</div>
+          <div class="field-control"><input type="text" value="New Drop Comment"></div>
+        </div>
+      </div>
+
+      <div class="editor-group">
+        <div class="editor-group-label">Keywords &amp; matching</div>
+        <div class="field-row">
+          <div>
+            <div class="field-label">Trigger keywords</div>
+            <div class="field-hint">Any of these tokens will trigger this rule.</div>
+          </div>
+          <div class="field-control">
+            <div class="tag-input-box">
+              <span class="kw-chip">drop<svg><use href="#i-x"/></svg></span>
+              <span class="kw-chip">restock<svg><use href="#i-x"/></svg></span>
+              <span class="kw-chip">back in stock<svg><use href="#i-x"/></svg></span>
+              <input type="text" placeholder="Add keyword, press Enter…">
+            </div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Match mode</div>
+          <div class="field-control">
+            <div class="select-wrap" style="max-width:220px">
+              <select><option>Contains</option><option>Exact match</option><option>Regular expression</option></select>
+              <svg><use href="#i-chevron"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Applies to</div>
+          <div class="field-control">
+            <div class="select-wrap" style="max-width:220px">
+              <select><option>Comment</option><option>Direct message</option><option>Story mention</option><option>All</option></select>
+              <svg><use href="#i-chevron"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-group">
+        <div class="editor-group-label">Response</div>
+        <div class="field-row">
+          <div>
+            <div class="field-label">Reply message</div>
+            <div class="field-hint">Sent via DM to the user who triggered the keyword.</div>
+          </div>
+          <div class="field-control">
+            <textarea>Hey! 🎉 The drop is live — here's your early link: https://yourlink.com/drop</textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-group">
+        <div class="editor-group-label">Media scope</div>
+        <div class="field-row">
+          <div>
+            <div class="field-label">Scope to a specific post</div>
+            <div class="field-hint">Leave "All posts" selected to match this rule anywhere, or pin it to one reel/post.</div>
+          </div>
+          <div class="field-control">
+            <div class="media-scroll">
+              <div class="media-tile all-posts"><svg><use href="#i-all"/></svg><span>All<br>posts</span></div>
+              <div class="media-tile selected">
+                <div class="media-thumb-fill"><svg><use href="#i-play"/></svg></div>
+                <span class="media-type-tag">REEL</span>
+                <div class="media-check"><svg><use href="#i-check"/></svg></div>
+                <div class="media-caption">Product Drop Teaser</div>
+              </div>
+              <div class="media-tile">
+                <div class="media-thumb-fill"><svg><use href="#i-image"/></svg></div>
+                <span class="media-type-tag">IMG</span>
+                <div class="media-caption">Studio BTS #12</div>
+              </div>
+              <div class="media-tile">
+                <div class="media-thumb-fill"><svg><use href="#i-layers"/></svg></div>
+                <span class="media-type-tag">ALBUM</span>
+                <div class="media-caption">Fall capsule preview</div>
+              </div>
+              <div class="media-tile">
+                <div class="media-thumb-fill"><svg><use href="#i-play"/></svg></div>
+                <span class="media-type-tag">REEL</span>
+                <div class="media-caption">Summer Giveaway Reel</div>
+              </div>
+              <div class="media-tile">
+                <div class="media-thumb-fill"><svg><use href="#i-image"/></svg></div>
+                <span class="media-type-tag">IMG</span>
+                <div class="media-caption">Founder note</div>
+              </div>
+            </div>
+            <div class="field-hint selected-label">Scoped to <strong>Product Drop Teaser</strong> · media id <strong>17862...4471</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-group">
+        <div class="editor-group-label">Public reply</div>
+        <div class="field-row">
+          <div class="toggle-row">
+            <label class="switch"><input type="checkbox" checked><span class="track"></span></label>
+            <div class="field-label">Also post a public comment reply</div>
+          </div>
+          <div class="field-control">
+            <textarea style="min-height:56px">Sent you the link! 📬 Check your DMs.</textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-group">
+        <div class="editor-group-label">Safeguards</div>
+        <div class="field-row">
+          <div class="toggle-row">
+            <label class="switch"><input type="checkbox"><span class="track"></span></label>
+            <div><div class="field-label">Require follow gate</div><div class="field-hint">User must follow before receiving the reward link.</div></div>
+          </div>
+          <div class="field-control">
+            <textarea style="min-height:56px" placeholder="Message shown to non-followers…"></textarea>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label"><svg style="width:13px;height:13px;stroke:currentColor;vertical-align:-2px;margin-right:4px"><use href="#i-clock"/></svg>Cooldown</div>
+          <div class="field-control">
+            <input type="number" value="1440" style="max-width:120px"> <span class="field-hint" style="display:inline">minutes per user, 0 = no cooldown</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-actions">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-primary"><svg><use href="#i-check"/></svg> Save rule</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

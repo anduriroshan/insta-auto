@@ -7,10 +7,9 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div>
+        <!-- Top Navigation -->
+        <header class="topbar">
+            <div class="topbar-left">
                 <div class="brand">
                     <div class="brand-icon">⚡</div>
                     <div>
@@ -49,7 +48,7 @@
                     <span>Sign Out</span>
                 </button>
             </div>
-        </aside>
+        </header>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -71,7 +70,7 @@
 
             <!-- Stats Grid -->
             <div class="stats-grid">
-                <div class="glass-card stat-card">
+                <div class="card stat-card">
                     <div class="stat-header">
                         <span class="stat-title">Active Rules</span>
                         <div class="stat-icon">⚡</div>
@@ -80,7 +79,7 @@
                     <div class="stat-subtext" id="stat-total-rules">Total rules: 0</div>
                 </div>
 
-                <div class="glass-card stat-card">
+                <div class="card stat-card">
                     <div class="stat-header">
                         <span class="stat-title">DMs Sent Today</span>
                         <div class="stat-icon">💬</div>
@@ -89,7 +88,7 @@
                     <div class="stat-subtext">Direct & private comment replies</div>
                 </div>
 
-                <div class="glass-card stat-card">
+                <div class="card stat-card">
                     <div class="stat-header">
                         <span class="stat-title">Follow Gates Blocked</span>
                         <div class="stat-icon">🚪</div>
@@ -98,7 +97,7 @@
                     <div class="stat-subtext">Unlocks queued for new followers</div>
                 </div>
 
-                <div class="glass-card stat-card">
+                <div class="card stat-card">
                     <div class="stat-header">
                         <span class="stat-title">Lifetime Triggers</span>
                         <div class="stat-icon">🚀</div>
@@ -109,7 +108,7 @@
             </div>
 
             <!-- Webhook Connection Status Card -->
-            <div class="glass-card" style="margin-bottom: 32px;">
+            <div class="card" style="margin-bottom: 32px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <span style="font-size: 1.5rem;">🔗</span>
@@ -127,15 +126,15 @@
                 </div>
 
                 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; font-size: 0.85rem; color: var(--text-secondary);">
-                    <div>Verify Token: <strong id="webhook-token-display" style="color: var(--accent-cyan);">my_secure_custom_verify_token_123</strong></div>
-                    <div>Events Supported: <strong style="color: #fff;">messages, comments, story mentions</strong></div>
+                    <div>Verify Token: <strong id="webhook-token-display" style="color: var(--text-primary); font-family: var(--font-mono);">my_secure_custom_verify_token_123</strong></div>
+                    <div>Events Supported: <strong style="color: var(--text-primary);">messages, comments, story mentions</strong></div>
                 </div>
             </div>
 
             <!-- Activity & Rules Split -->
             <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px;">
                 <!-- Real-time Activity Feed -->
-                <div class="glass-card">
+                <div class="card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <h3 style="font-size: 1.15rem; font-weight: 700;">Live Activity Feed</h3>
@@ -152,7 +151,7 @@
                 </div>
 
                 <!-- Quick Active Rules Overview -->
-                <div class="glass-card">
+                <div class="card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <h3 style="font-size: 1.15rem; font-weight: 700;">Active Keyword Rules</h3>
                         <a href="/static/rules.html" class="btn btn-secondary btn-sm">Manage Rules →</a>
@@ -166,7 +165,6 @@
                 </div>
             </div>
         </main>
-    </div>
 
     <script src="/static/js/app.js"></script>
     <script src="/static/js/dashboard.js"></script>

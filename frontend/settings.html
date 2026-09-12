@@ -7,10 +7,9 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div>
+        <!-- Top Navigation -->
+        <header class="topbar">
+            <div class="topbar-left">
                 <div class="brand">
                     <div class="brand-icon">⚡</div>
                     <div>
@@ -49,7 +48,7 @@
                     <span>Sign Out</span>
                 </button>
             </div>
-        </aside>
+        </header>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -69,7 +68,7 @@
             <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 28px;">
                 <!-- Left Column: Credentials Form -->
                 <div>
-                    <div class="glass-card" style="margin-bottom: 24px;">
+                    <div class="card" style="margin-bottom: 24px;">
                         <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px;">
                             🔑 Meta Graph API Credentials
                         </h3>
@@ -121,7 +120,7 @@
                     </div>
 
                     <!-- Ice Breakers Card -->
-                    <div class="glass-card">
+                    <div class="card">
                         <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 6px;">
                             ❄️ Conversation Starters (Ice Breakers)
                         </h3>
@@ -148,12 +147,12 @@
 
                 <!-- Right Column: Meta Setup Instructions -->
                 <div>
-                    <div class="glass-card">
+                    <div class="card">
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
                             <span style="font-size: 1.6rem;">📖</span>
                             <div>
                                 <h3 style="font-size: 1.2rem; font-weight: 700;">Meta Developer Setup Guide</h3>
-                                <p style="font-size: 0.82rem; color: var(--accent-cyan);">Zero Ban Risk • 100% Free Official Setup</p>
+                                <p style="font-size: 0.82rem; color: var(--text-secondary);">Zero Ban Risk • 100% Free Official Setup</p>
                             </div>
                         </div>
 
@@ -177,7 +176,7 @@
                                 <span>▼</span>
                             </div>
                             <div class="accordion-body">
-                                1. Visit <a href="https://developers.facebook.com" target="_blank" style="color: var(--accent-cyan);">developers.facebook.com</a> and sign in.<br>
+                                1. Visit <a href="https://developers.facebook.com" target="_blank" class="link">developers.facebook.com</a> and sign in.<br>
                                 2. Click <strong>My Apps &gt; Create App</strong>.<br>
                                 3. Select <strong>Other</strong> &gt; choose <strong>Business</strong> as the app type.<br>
                                 4. Enter an App Name (e.g. <code>My Instagram Automator</code>) and complete creation.<br>
@@ -209,7 +208,7 @@
                                 2. In <strong>Meta App</strong>, select your newly created app.<br>
                                 3. In <strong>User or Page</strong>, select your Facebook Page.<br>
                                 4. Add the permissions:
-                                   <ul style="margin: 8px 0 8px 20px; color: #fff;">
+                                   <ul style="margin: 8px 0 8px 20px; color: var(--text-primary);">
                                        <li><code>instagram_manage_messages</code></li>
                                        <li><code>instagram_manage_comments</code></li>
                                        <li><code>pages_manage_metadata</code></li>
@@ -254,7 +253,6 @@
                 </div>
             </div>
         </main>
-    </div>
 
     <script src="/static/js/app.js"></script>
     <script src="/static/js/settings.js"></script>

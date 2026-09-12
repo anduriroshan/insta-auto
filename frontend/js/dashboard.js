@@ -38,14 +38,7 @@ async function loadWebhookSettings() {
 
 function renderActivityItem(log) {
     const item = document.createElement("div");
-    item.style.padding = "12px 14px";
-    item.style.borderRadius = "var(--radius-md)";
-    item.style.background = "rgba(255, 255, 255, 0.03)";
-    item.style.border = "1px solid var(--border-glass)";
-    item.style.display = "flex";
-    item.style.alignItems = "center";
-    item.style.justifyContent = "space-between";
-    item.style.animation = "fadeIn 0.3s ease-out";
+    item.className = "activity-item";
 
     let icon = "💬";
     let badgeClass = "badge-info";
@@ -59,20 +52,20 @@ function renderActivityItem(log) {
     const timeAgo = log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : "";
 
     item.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
-            <div style="font-size: 1.25rem;">${icon}</div>
+        <div class="activity-item-main">
+            <div class="activity-item-icon">${icon}</div>
             <div style="overflow: hidden;">
-                <div style="font-weight: 600; font-size: 0.88rem; color: #fff; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                <div class="activity-item-user">
                     ${log.sender_username ? '@' + log.sender_username : (log.sender_id || 'Instagram User')}
                 </div>
-                <div style="font-size: 0.78rem; color: var(--text-secondary); text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                <div class="activity-item-detail">
                     ${log.details || log.event_type}
                 </div>
             </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 12px;">
+        <div class="activity-item-meta">
             <span class="badge ${badgeClass}">${log.status}</span>
-            <span style="font-size: 0.75rem; color: var(--text-muted);">${timeAgo}</span>
+            <span class="activity-item-time">${timeAgo}</span>
         </div>
     `;
 
@@ -85,7 +78,7 @@ async function loadRecentLogs() {
         const container = document.getElementById("live-activity-list");
         if (logs.length === 0) {
             container.innerHTML = `
-                <div style="text-align: center; color: var(--text-muted); padding: 40px;">
+                <div class="empty-state">
                     No events recorded yet. Send a test DM or comment to see events here live!
                 </div>
             `;
@@ -109,8 +102,8 @@ async function loadQuickRules() {
 
         if (activeRules.length === 0) {
             container.innerHTML = `
-                <div style="text-align: center; color: var(--text-muted); padding: 30px;">
-                    No active rules found. <a href="/static/rules.html?action=new" style="color: var(--accent-cyan);">Create one now</a>
+                <div class="empty-state">
+                    No active rules found. <a href="/static/rules.html?action=new" class="link">Create one now</a>
                 </div>
             `;
             return;
@@ -119,26 +112,20 @@ async function loadQuickRules() {
         container.innerHTML = "";
         activeRules.slice(0, 5).forEach(rule => {
             const card = document.createElement("div");
-            card.style.padding = "12px 14px";
-            card.style.background = "rgba(255, 255, 255, 0.02)";
-            card.style.border = "1px solid var(--border-glass)";
-            card.style.borderRadius = "var(--radius-sm)";
-            card.style.display = "flex";
-            card.style.justifyContent = "space-between";
-            card.style.alignItems = "center";
+            card.className = "quick-rule-card";
 
             const keywordsHtml = rule.keywords.map(k => `<span class="keyword-tag">${k}</span>`).join(" ");
 
             card.innerHTML = `
                 <div>
-                    <div style="font-weight: 600; font-size: 0.88rem; color: #fff; margin-bottom: 4px;">${rule.name}</div>
+                    <div class="quick-rule-name">${rule.name}</div>
                     <div>${keywordsHtml}</div>
                 </div>
                 <div style="text-align: right;">
-                    <span class="badge ${rule.follow_gate_enabled ? 'badge-warning' : 'badge-info'}" style="font-size: 0.7rem;">
+                    <span class="badge ${rule.follow_gate_enabled ? 'badge-warning' : 'badge-info'}">
                         ${rule.follow_gate_enabled ? 'Gate ON' : 'Direct'}
                     </span>
-                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">
+                    <div class="quick-rule-triggers">
                         ${rule.trigger_count} triggers
                     </div>
                 </div>
