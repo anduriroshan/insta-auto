@@ -54,7 +54,9 @@ cover/
 # Translations
 *.mo
 *.pot
+*.env
 .env
+insta_auto.db
 
 # Django stuff:
 *.log
