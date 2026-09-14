@@ -109,6 +109,61 @@ class InstagramGraphAPI:
                 logger.error(f"Meta Send DM error: {data}")
             return data
 
+    async def send_dm_with_quick_replies(
+        self, recipient_id: str, text: str, quick_replies: List[Dict[str, str]]
+    ) -> Dict[str, Any]:
+        """
+        Sends a DM with Quick Reply buttons (tappable chips below the message).
+        quick_replies: list of dicts with keys 'content_type', 'title', 'payload'.
+        Example: [{"content_type": "text", "title": "Send me the link ✨", "payload": "SEND_LINK_RULE_1"}]
+        """
+        if not self.access_token:
+            raise ValueError("PAGE_ACCESS_TOKEN is not configured.")
+
+        url = f"{self.base_url}/{self.target_endpoint}/messages"
+        params = {"access_token": self.access_token}
+        payload = {
+            "recipient": {"id": recipient_id},
+            "messaging_type": "RESPONSE",
+            "message": {
+                "text": text,
+                "quick_replies": quick_replies
+            }
+        }
+
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            res = await self._request_with_retry(client, "POST", url, params=params, json=payload)
+            data = res.json()
+            if res.status_code >= 400:
+                logger.error(f"Meta Quick Reply DM error: {data}")
+            return data
+
+    async def send_private_reply_with_quick_replies(
+        self, comment_id: str, text: str, quick_replies: List[Dict[str, str]]
+    ) -> Dict[str, Any]:
+        """
+        Sends a private reply DM (triggered from a comment) with Quick Reply buttons.
+        """
+        if not self.access_token:
+            raise ValueError("PAGE_ACCESS_TOKEN is not configured.")
+
+        url = f"{self.base_url}/{self.target_endpoint}/messages"
+        params = {"access_token": self.access_token}
+        payload = {
+            "recipient": {"comment_id": comment_id},
+            "message": {
+                "text": text,
+                "quick_replies": quick_replies
+            }
+        }
+
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            res = await self._request_with_retry(client, "POST", url, params=params, json=payload)
+            data = res.json()
+            if res.status_code >= 400:
+                logger.error(f"Meta Private Reply Quick Reply error: {data}")
+            return data
+
     async def send_private_reply(self, comment_id: str, text: str) -> Dict[str, Any]:
         """
         Sends a private reply DM to an Instagram user from a comment.

@@ -132,6 +132,12 @@ def parse_webhook_payload(data: Dict[str, Any]) -> List[ParsedEvent]:
                     media_id = str(media.get("id", ""))
                     text = value.get("text", "")
 
+                    # ── Ignore the bot's own comments/replies to prevent infinite loops ──
+                    bot_ig_id = settings.INSTAGRAM_ACCOUNT_ID
+                    if bot_ig_id and sender_id == bot_ig_id:
+                        logger.info(f"Skipping own comment from bot account {sender_id}")
+                        continue
+
                     events.append(ParsedEvent(
                         event_type="comment",
                         sender_id=sender_id,
@@ -145,3 +151,4 @@ def parse_webhook_payload(data: Dict[str, Any]) -> List[ParsedEvent]:
                     ))
 
     return events
+
